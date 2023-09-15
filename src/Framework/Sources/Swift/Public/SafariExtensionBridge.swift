@@ -289,6 +289,10 @@ public class SafariExtensionBridge: NSObject, SafariExtensionBridgeType, WKScrip
     /// Handles messages from the brackground script(s).
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         assert(Thread.isMainThread)
+        logger.debug("#appex(<-background): -------------------- DEBUG 1 \(message.name) -----------------")
+
+        dump(message.body)
+
         if message.name != MessageHandler.log.rawValue {
             logger.debug("#appex(<-background): { 'name': \(message.name), 'body': \(prettyPrintJSObject(message.body)) }")
         }
@@ -480,6 +484,10 @@ public class SafariExtensionBridge: NSObject, SafariExtensionBridgeType, WKScrip
     }
 
     public func sendMessageToBackgroundScript(payload: [String: Any]) {
+        logger.debug("#appex(<-background): -------------------- DEBUG 2 -----------------")
+
+        dump(payload)
+
         if payload["eventName"] == nil || payload["eventName"] as? String == nil || payload["eventName"] as! String != "alive" {
           logger.debug("#appex(->background): message { payload: \(prettyPrintJSObject(payload)) }")
         }
@@ -494,6 +502,10 @@ public class SafariExtensionBridge: NSObject, SafariExtensionBridgeType, WKScrip
     }
 
     private func sendMessageToContentScript(page: SFSafariPage, withName: String, userInfo: [String: Any]? = nil) {
+        logger.debug("#appex(<-background): -------------------- DEBUG 3 -----------------")
+
+        dump(userInfo)
+
         logger.debug("#appex(->content): page \(page.hashValue) message { name: \(withName), userInfo: \(prettyPrintJSObject(userInfo ?? [:])) }")
         page.dispatchMessageToScript(withName: withName, userInfo: userInfo)
     }
