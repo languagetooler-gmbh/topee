@@ -291,8 +291,6 @@ public class SafariExtensionBridge: NSObject, SafariExtensionBridgeType, WKScrip
         assert(Thread.isMainThread)
         logger.debug("#appex(<-background): -------------------- DEBUG 1 \(message.name) -----------------")
 
-        dump(message.body)
-
         if message.name != MessageHandler.log.rawValue {
             logger.debug("#appex(<-background): { 'name': \(message.name), 'body': \(prettyPrintJSObject(message.body)) }")
         }
@@ -486,8 +484,6 @@ public class SafariExtensionBridge: NSObject, SafariExtensionBridgeType, WKScrip
     public func sendMessageToBackgroundScript(payload: [String: Any]) {
         logger.debug("#appex(<-background): -------------------- DEBUG 2 -----------------")
 
-        dump(payload)
-
         if payload["eventName"] == nil || payload["eventName"] as? String == nil || payload["eventName"] as! String != "alive" {
           logger.debug("#appex(->background): message { payload: \(prettyPrintJSObject(payload)) }")
         }
@@ -503,8 +499,6 @@ public class SafariExtensionBridge: NSObject, SafariExtensionBridgeType, WKScrip
 
     private func sendMessageToContentScript(page: SFSafariPage, withName: String, userInfo: [String: Any]? = nil) {
         logger.debug("#appex(<-background): -------------------- DEBUG 3 -----------------")
-
-        dump(userInfo)
 
         logger.debug("#appex(->content): page \(page.hashValue) message { name: \(withName), userInfo: \(prettyPrintJSObject(userInfo ?? [:])) }")
         page.dispatchMessageToScript(withName: withName, userInfo: userInfo)
@@ -633,14 +627,6 @@ public class SafariExtensionBridge: NSObject, SafariExtensionBridgeType, WKScrip
 
     /// Pretty prints the given Javascript object
     private func prettyPrintJSObject(_ obj: Any) -> String {
-        do {
-            // Since we are receiving objects for/from JavaScript they should always be serializable
-            let str = try JSONSerialization.data(withJSONObject: obj, options: .prettyPrinted)
-            return String(data: str, encoding: .utf8)!
-        } catch {
-            let message = "Could not serialize the given JS object"
-            logger.error(message)
-            fatalError(message)
-        }
+        return "\(obj as AnyObject)"
     }
 }
